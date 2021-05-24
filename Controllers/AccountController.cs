@@ -38,25 +38,28 @@ namespace API.Controllers
                await _context.SaveChangesAsync();
 
                return user;
-         }
-         [HttpPost("login")]
+         }  [HttpPost("longin")]
 
-         public async Task<ActionResult<AppUser>> Login(LoginDTO loginDTO){
-            var user = await _context.Users.SingleOrDefaultAsync(user => user.UserName == loginDTO.UserName);
-            if (user == null) return Unauthorized("Usuarion invalido");
+           public async Task<ActionResult<AppUser>> Login(LoginDTO loginDTO)
+           {
+              var user =  await _context.Users.SingleOrDefaultAsync(user => user.UserName == loginDTO.UserName);
 
-            using var hmac = new HMACSHA512(user.PasswordSalt);
-            var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
+              if(user == null) return Unauthorized("Usuario invalido");
 
-            for(int i = 0; i < computedHash.Length; i++)
-            {
-                if(computedHash[i] !=user.PasswordSalt[i]) return Unauthorized("Pasword invalido");
-            }
+              using var  hmc = new HMACSHA512 (user.PasswordSalt);
+              var ComputeHash = hmc.ComputeHash(Encoding.UTF8.GetBytes(loginDTO.Password));
 
-            return user;
-         }
+              for(int i = 0; i < ComputeHash.Length; i++)
+              {
+                 if(ComputeHash[i] != user.PasswordSalt[i]) return Unauthorized("Password invalido");
+              }
 
-         private async Task <bool> UserExist(string username)
+              return user;
+              
+           }
+         
+
+         private async Task<bool>UserExist(string username)
          {
           return await _context.Users.AnyAsync(variable => variable.UserName == username.ToLower());
          }
